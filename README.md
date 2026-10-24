@@ -1,0 +1,1 @@
+# -genera-tu-c-digo-QR-para-impresi-n-3D-
