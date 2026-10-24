@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR3D Print - Diseña y genera tu código QR para impresión 3D (3MF y STL)</title>
+    <meta name="description" content="Genera gratis códigos QR 3D para imprimir en tu impresora 3D. Descarga en formato 3MF multicolor y STL. Ideal para soportes de restaurante, llaveros y placas de pared.">
+    <meta name="keywords" content="codigo QR para imprimir en 3D, QR llavero 3D, QR 3MF Bambu Lab, QR restaurante 3D, QR wifi 3D, STL QR code generator">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CDN Libraries: Three.js, OrbitControls, JSZip, QRCode -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        /* Canvas preview frame styling */
+        #canvas3d-container {
+            position: relative;
+            width: 100%;
+            height: 420px;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-tr from-brand-600 to-indigo-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid font-black fa-cube"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">QR3D<span class="text-brand-500">Print</span></span>
+                    <span class="hidden sm:inline-block text-xs text-slate-400 ml-2 px-2 py-0.5 bg-slate-800 rounded-full border border-slate-700">3MF & STL 3D Generator</span>
+                </div>
+            </div>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
+                <a href="#herramienta" class="hover:text-brand-400 transition-colors">Generador</a>
+                <a href="#como-funciona" class="hover:text-brand-400 transition-colors">Cómo Funciona</a>
+                <a href="#casos-uso" class="hover:text-brand-400 transition-colors">Ejemplos de Uso</a>
+                <a href="#faq" class="hover:text-brand-400 transition-colors">Preguntas Frecuentes</a>
+            </nav>
+            <a href="#herramienta" class="bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs sm:text-sm px-4 py-2 rounded-lg shadow-md hover:shadow-brand-500/20 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Crear QR 3D
+            </a>
+        </div>
+    </header>
+
+    <!-- HERO HEADER & TOOL CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+
+        <!-- Title & Subtitle -->
+        <section class="text-center max-w-3xl mx-auto space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold">
+                <i class="fa-solid fa-sparkles"></i> Gratis • Exportación Directa 3MF Multicolor y STL
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                Diseña y genera tu código QR para impresión 3D
+            </h1>
+            <p class="text-slate-400 text-sm sm:text-base">
+                Transforma cualquier enlace, Wi-Fi o carta de restaurante en un modelo 3D físico listo para imprimir en Bambu Lab, Prusa, Creality o cualquier impresora 3D.
+            </p>
+        </section>
+
+        <!-- MAIN INTERACTIVE APP SECTION -->
+        <section id="herramienta" class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden p-4 sm:p-6 lg:p-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                <!-- CONTROLS COLUMN (LEFT) -->
+                <div class="lg:col-span-6 space-y-6">
+                    
+                    <!-- STEP 1: Content Input -->
+                    <div class="space-y-3 bg-slate-800/50 p-4 rounded-xl border border-slate-700/60">
+                        <label class="block text-sm font-semibold text-slate-200 flex items-center justify-between">
+                            <span><i class="fa-solid fa-link text-brand-400 mr-2"></i>1. Contenido del Código QR</span>
+                            <span class="text-xs text-slate-400 font-normal">URL, Menú, Instagram...</span>
+                        </label>
+                        <input type="text" id="qrInput" value="https://instagram.com" placeholder="Ej: https://mi-restaurante.com/carta" 
+                               class="w-full bg-slate-950 border border-slate-700 focus:border-brand-500 rounded-lg px-4 py-2.5 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/30 transition-all" />
+                    </div>
+
+                    <!-- STEP 2: 3D Object Format Selection -->
+                    <div class="space-y-3 bg-slate-800/50 p-4 rounded-xl border border-slate-700/60">
+                        <label class="block text-sm font-semibold text-slate-200">
+                            <i class="fa-solid fa-cubes text-brand-400 mr-2"></i>2. Formato del Objeto 3D
+                        </label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" data-format="soporte" class="format-btn active border-2 border-brand-500 bg-brand-500/10 text-white rounded-lg p-3 text-center flex flex-col items-center justify-center gap-1 transition-all">
+                                <i class="fa-solid fa-chalkboard-user text-lg"></i>
+                                <span class="text-xs font-medium">Soporte Mesa</span>
+                            </button>
+                            <button type="button" data-format="llavero" class="format-btn border border-slate-700 hover:border-slate-600 bg-slate-950 text-slate-300 rounded-lg p-3 text-center flex flex-col items-center justify-center gap-1 transition-all">
+                                <i class="fa-solid fa-key text-lg"></i>
+                                <span class="text-xs font-medium">Llavero</span>
+                            </button>
+                            <button type="button" data-format="placa" class="format-btn border border-slate-700 hover:border-slate-600 bg-slate-950 text-slate-300 rounded-lg p-3 text-center flex flex-col items-center justify-center gap-1 transition-all">
+                                <i class="fa-solid fa-square-parking text-lg"></i>
+                                <span class="text-xs font-medium">Placa Pared</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Text & Emoji Options -->
+                    <div class="space-y-3 bg-slate-800/50 p-4 rounded-xl border border-slate-700/60">
+                        <label class="block text-sm font-semibold text-slate-200">
+                            <i class="fa-solid fa-font text-brand-400 mr-2"></i>3. Texto grabado y Emoji central
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Texto en la base:</label>
+                                <input type="text" id="baseText" value="ESCANÉAME" maxlength="22" placeholder="Ej: RESTAURANTE EL SOL" 
+                                       class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-brand-500 focus:outline-none" />
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Emoji central / Icono:</label>
+                                <select id="centerEmoji" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 text-xs focus:border-brand-500 focus:outline-none">
+                                    <option value="none">Sin Emoji</option>
+                                    <option value="⭐">⭐ Estrella</option>
+                                    <option value="☕">☕ Café / Bar</option>
+                                    <option value="🍕">🍕 Restaurante</option>
+                                    <option value="📶">📶 Wi-Fi</option>
+                                    <option value="❤️">❤️ Corazón</option>
+                                    <option value="👍">👍 Reseñas</option>
+                                    <option value="🔑">🔑 Airbnb / Llave</option>
+                                    <option value="📷">📷 Instagram</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: Color Customization -->
+                    <div class="space-y-3 bg-slate-800/50 p-4 rounded-xl border border-slate-700/60">
+                        <label class="block text-sm font-semibold text-slate-200">
+                            <i class="fa-solid fa-palette text-brand-400 mr-2"></i>4. Colores de Impresión (2 Filamentos)
+                        </label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Color Base (Filamento 1):</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="baseColor" value="#1e293b" class="w-10 h-10 rounded cursor-pointer bg-transparent border-0" />
+                                    <span id="baseColorHex" class="text-xs font-mono text-slate-300">#1e293b</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Color QR/Texto (Filamento 2):</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="qrColor" value="#38bdf8" class="w-10 h-10 rounded cursor-pointer bg-transparent border-0" />
+                                    <span id="qrColorHex" class="text-xs font-mono text-slate-300">#38bdf8</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PRESET COLOR SUGGESTIONS -->
+                    <div class="flex items-center gap-2 flex-wrap text-xs text-slate-400">
+                        <span>Combinaciones con contraste:</span>
+                        <button type="button" onclick="setPresetColors('#ffffff', '#000000')" class="px-2 py-1 bg-slate-800 rounded border border-slate-700 hover:border-slate-500">Blanco/Negro</button>
+                        <button type="button" onclick="setPresetColors('#111827', '#e11d48')" class="px-2 py-1 bg-slate-800 rounded border border-slate-700 hover:border-slate-500">Negro/Rojo</button>
+                        <button type="button" onclick="setPresetColors('#0f172a', '#38bdf8')" class="px-2 py-1 bg-slate-800 rounded border border-slate-700 hover:border-slate-500">Dark/Cyan</button>
+                        <button type="button" onclick="setPresetColors('#14532d', '#facc15')" class="px-2 py-1 bg-slate-800 rounded border border-slate-700 hover:border-slate-500">Verde/Amarillo</button>
+                    </div>
+
+                </div>
+
+                <!-- PREVIEW & DOWNLOAD COLUMN (RIGHT) -->
+                <div class="lg:col-span-6 flex flex-col justify-between space-y-6">
+                    
+                    <!-- 3D PREVIEW CANVAS CONTAINER -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                <i class="fa-solid fa-eye text-brand-400"></i> Vista Previa Interactivas 3D
+                            </span>
+                            <span class="text-xs text-slate-500">Arrastra para girar • Rueda para Zoom</span>
+                        </div>
+                        
+                        <div id="canvas3d-container" class="shadow-inner border border-slate-800">
+                            <!-- Canvas created dynamically by Three.js -->
+                            <div class="absolute bottom-3 left-3 z-10 pointer-events-none bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700/50 text-[11px] text-slate-300">
+                                Altura relieve QR: <span class="text-brand-400 font-bold">1.0 mm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DOWNLOAD BUTTONS SECTION -->
+                    <div class="space-y-3 bg-slate-800/40 p-4 rounded-xl border border-slate-800">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">Descargar Archivos</span>
+                        
+                        <!-- 3D EXPORT BUTTONS -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button id="btnDownload3MF" class="w-full bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-brand-500/20 transition-all flex items-center justify-center gap-2 group">
+                                <i class="fa-solid fa-cube text-lg group-hover:scale-110 transition-transform"></i>
+                                <div class="text-left">
+                                    <div class="text-sm">Descargar 3MF</div>
+                                    <div class="text-[10px] text-brand-200 font-normal">Multicolor (Bambu/Prusa)</div>
+                                </div>
+                            </button>
+
+                            <button id="btnDownloadSTL" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 group">
+                                <i class="fa-solid fa-file-code text-lg text-slate-400 group-hover:scale-110 transition-transform"></i>
+                                <div class="text-left">
+                                    <div class="text-sm">Descargar STL</div>
+                                    <div class="text-[10px] text-slate-400 font-normal">Monopieza / Estándar</div>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- 2D EXPORT BUTTONS -->
+                        <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2">
+                            <span class="text-xs text-slate-400">Descarga 2D clásica:</span>
+                            <div class="flex gap-2">
+                                <button id="btnDownloadPNG" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg transition-colors flex items-center gap-1.5">
+                                    <i class="fa-solid fa-image text-slate-400"></i> PNG
+                                </button>
+                                <button id="btnDownloadSVG" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-lg transition-colors flex items-center gap-1.5">
+                                    <i class="fa-solid fa-vector-square text-slate-400"></i> SVG
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ADVERTISEMENT PLACEHOLDER #1: MAIN BANNER UNDER TOOL -->
+        <div class="w-full bg-slate-900/60 border border-dashed border-slate-700/80 rounded-xl p-4 text-center my-8 transition-all hover:border-slate-600">
+            <div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Anuncio / Publicidad</div>
+            <div class="h-20 bg-slate-950/80 rounded-lg border border-slate-800 flex items-center justify-center max-w-4xl mx-auto text-slate-600 text-sm font-mono">
+                <i class="fa-solid fa-rectangle-ad text-lg mr-2"></i> BANNER PUBLICITARIO (728x90 / Responsive)
+            </div>
+        </div>
+
+        <!-- HOW IT WORKS SECTION (3 STEPS) -->
+        <section id="como-funciona" class="py-8 space-y-8">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white">¿Cómo imprimir tu Código QR en 3D en 3 Pasos?</h2>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">Sin registros ni programas complicados de modelado. Genera archivos optimizados para cualquier laminador de impresión 3D en segundos.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl relative overflow-hidden group hover:border-brand-500/50 transition-all">
+                    <div class="text-4xl font-black text-brand-500/20 absolute top-4 right-4 group-hover:text-brand-500/30 transition-colors">01</div>
+                    <div class="w-12 h-12 bg-brand-500/10 text-brand-400 rounded-xl flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-link"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Ingresa tu Enlace</h3>
+                    <p class="text-slate-400 text-sm">Pega la dirección URL de tu menú de restaurante, red social, reseña de Google Maps o datos de conexión Wi-Fi.</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl relative overflow-hidden group hover:border-brand-500/50 transition-all">
+                    <div class="text-4xl font-black text-brand-500/20 absolute top-4 right-4 group-hover:text-brand-500/30 transition-colors">02</div>
+                    <div class="w-12 h-12 bg-brand-500/10 text-brand-400 rounded-xl flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-palette"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Personaliza en 3D</h3>
+                    <p class="text-slate-400 text-sm">Escoge entre soporte de mesa, llavero o placa de pared. Elige los 2 colores de tus filamentos y añade texto personalizado.</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl relative overflow-hidden group hover:border-brand-500/50 transition-all">
+                    <div class="text-4xl font-black text-brand-500/20 absolute top-4 right-4 group-hover:text-brand-500/30 transition-colors">03</div>
+                    <div class="w-12 h-12 bg-brand-500/10 text-brand-400 rounded-xl flex items-center justify-center text-xl mb-4">
+                        <i class="fa-solid fa-print"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Descarga e Imprime</h3>
+                    <p class="text-slate-400 text-sm">Exporta en 3MF para cargarlo con colores automáticos en Bambu Studio / PrusaSlicer o STL para impresoras mono-extrusor.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADVERTISEMENT PLACEHOLDER #2: MID CONTENT BANNER -->
+        <div class="w-full bg-slate-900/60 border border-dashed border-slate-700/80 rounded-xl p-4 text-center my-6">
+            <div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1">Anuncio / Publicidad</div>
+            <div class="h-24 bg-slate-950/80 rounded-lg border border-slate-800 flex items-center justify-center max-w-3xl mx-auto text-slate-600 text-sm font-mono">
+                <i class="fa-solid fa-rectangle-ad text-lg mr-2"></i> ANUNCIO DE MITAD DE PÁGINA (300x250 / 728x90)
+            </div>
+        </div>
+
+        <!-- USE CASES SECTION -->
+        <section id="casos-uso" class="py-8 space-y-8">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white">Casos de Uso e Ideas de Aplicación</h2>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">Aumenta la interacción física de tu negocio o eventos con códigos QR 3D duraderos e higiénicos.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-all">
+                    <div class="text-brand-400 text-2xl mb-3"><i class="fa-solid fa-utensils"></i></div>
+                    <h4 class="font-bold text-white mb-1">Restaurantes y Bares</h4>
+                    <p class="text-xs text-slate-400">Soportes de mesa resistentes a líquidos con la carta digital o menú QR. Fáciles de desinfectar.</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-all">
+                    <div class="text-brand-400 text-2xl mb-3"><i class="fa-solid fa-star"></i></div>
+                    <h4 class="font-bold text-white mb-1">Reseñas de Google</h4>
+                    <p class="text-xs text-slate-400">Placas para mostrador o recepción incentivando a clientes a dejar una valoración con un escaneo.</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-all">
+                    <div class="text-brand-400 text-2xl mb-3"><i class="fa-solid fa-key"></i></div>
+                    <h4 class="font-bold text-white mb-1">Llaveros Airbnb y Eventos</h4>
+                    <p class="text-xs text-slate-400">Llaveros 3D para huéspedes con acceso rápido a las instrucciones de la casa, Wi-Fi o llaves inteligentes.</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-all">
+                    <div class="text-brand-400 text-2xl mb-3"><i class="fa-solid fa-wifi"></i></div>
+                    <h4 class="font-bold text-white mb-1">Acceso Wi-Fi Rápido</h4>
+                    <p class="text-xs text-slate-400">Placas colgantes para oficinas o salas de espera conectando al cliente a la red Wi-Fi sin escribir contraseñas.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRINT TIPS SECTION -->
+        <section class="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-brand-500/20 rounded-2xl p-6 sm:p-8 space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-brand-500/20 text-brand-400 rounded-lg flex items-center justify-center font-bold text-lg">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-white">Consejos para una Impresión 3D Perfecta del Código QR</h3>
+                    <p class="text-xs text-slate-400">Recomendaciones técnicas de laminado para garantizar una lectura con smartphone a la primera.</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-300">
+                <div class="bg-slate-950/60 p-3.5 rounded-lg border border-slate-800">
+                    <strong class="text-brand-400 block mb-1">1. Contraste de Colores</strong>
+                    Usa siempre una base oscura con texto/QR claro, o viceversa. Evita filamentos transparentes o brillantes que creen reflejos.
+                </div>
+                <div class="bg-slate-950/60 p-3.5 rounded-lg border border-slate-800">
+                    <strong class="text-brand-400 block mb-1">2. Altura de Capa 0.2mm</strong>
+                    El relieve del QR tiene 1.0mm de altura, lo que equivale a exactamente 5 capas a 0.2mm de resolución para bordes limpios.
+                </div>
+                <div class="bg-slate-950/60 p-3.5 rounded-lg border border-slate-800">
+                    <strong class="text-brand-400 block mb-1">3. Cambio de Filamento</strong>
+                    Si usas el archivo STL en una impresora monocolor, añade una pausa en tu laminador (comando M600) justo en la capa donde inicia el relieve.
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ ACCORDION SECTION -->
+        <section id="faq" class="py-8 space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl sm:text-3xl font-bold text-white">Preguntas Frecuentes (FAQ)</h2>
+                <p class="text-slate-400 text-sm max-w-xl mx-auto">Resuelve tus dudas sobre la exportación 3MF, compatibilidad y escaneo de códigos QR 3D.</p>
+            </div>
+
+            <div class="max-w-3xl mx-auto space-y-3">
+                <!-- FAQ Item 1 -->
+                <details class="group bg-slate-900 border border-slate-800 rounded-xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer text-slate-200 font-semibold text-sm group-open:text-brand-400 transition-colors">
+                        <span>¿Por qué descargar en formato 3MF en lugar de STL?</span>
+                        <i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180 text-slate-400"></i>
+                    </summary>
+                    <div class="px-4 pb-4 text-xs text-slate-400 leading-relaxed border-t border-slate-800/50 pt-3">
+                        El formato 3MF es el estándar moderno de la impresión 3D (soportado por Bambu Studio, PrusaSlicer, OrcaSlicer y Cura). Guarda la base y el relieve del QR como partes separadas asignadas a materiales independientes, permitiendo imprimir multicolor directamente sin separar piezas manualmente.
+                    </div>
+                </details>
+
+                <!-- FAQ Item 2 -->
+                <details class="group bg-slate-900 border border-slate-800 rounded-xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer text-slate-200 font-semibold text-sm group-open:text-brand-400 transition-colors">
+                        <span>¿Puedo imprimirlo si no tengo sistema de cambio de color automático (AMS/MMU)?</span>
+                        <i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180 text-slate-400"></i>
+                    </summary>
+                    <div class="px-4 pb-4 text-xs text-slate-400 leading-relaxed border-t border-slate-800/50 pt-3">
+                        ¡Sí! Puedes descargar el archivo STL o 3MF, laminarlo para tu impresora estándar y programar un cambio de filamento manual por pausa (M600) a la altura donde comienza el relieve (por encima de los 3mm o 4mm de la base).
+                    </div>
+                </details>
+
+                <!-- FAQ Item 3 -->
+                <details class="group bg-slate-900 border border-slate-800 rounded-xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                    <summary class="flex items-center justify-between p-4 cursor-pointer text-slate-200 font-semibold text-sm group-open:text-brand-400 transition-colors">
+                        <span>¿Qué cámara de móvil se necesita para escanear el QR impreso?</span>
+                        <i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180 text-slate-400"></i>
+                    </summary>
+                    <div class="px-4 pb-4 text-xs text-slate-400 leading-relaxed border-t border-slate-800/50 pt-3">
+                        Cualquier móvil iOS o Android moderno puede escanearlo instantáneamente siempre que haya buen contraste de color (ejemplo: fondo negro y QR blanco o amarillo). El relieve de 1.0mm genera sombras naturales que ayudan al sensor a detectar los patrones.
+                    </div>
+                </details>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-8 mt-12 text-center text-slate-500 text-xs">
+        <div class="max-w-7xl mx-auto px-4 space-y-4">
+            <div class="flex items-center justify-center gap-2 text-slate-300 font-bold text-sm">
+                <i class="fa-solid fa-cube text-brand-500"></i> QR3D Print
+            </div>
+            <p>Generador gratuito de códigos QR 3D optimizados para Bambu Lab, Prusa, Creality y Ultimaker.</p>
+            <p class="text-slate-600">© 2026 QR3D Print. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- STICKY / CORNER ADVERTISEMENT NOTIFICATION -->
+    <div id="stickyAd" class="fixed bottom-4 right-4 z-30 max-w-xs bg-slate-900 border border-slate-700 p-3 rounded-xl shadow-2xl flex items-center gap-3">
+        <button onclick="document.getElementById('stickyAd').remove()" class="absolute -top-2 -right-2 bg-slate-800 text-slate-400 hover:text-white rounded-full w-5 h-5 flex items-center justify-center text-xs border border-slate-600">✕</button>
+        <div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center text-brand-400 shrink-0">
+            <i class="fa-solid fa-rectangle-ad text-lg"></i>
+        </div>
+        <div class="text-[11px] leading-tight">
+            <span class="font-bold text-slate-300 block mb-0.5">PUBLICIDAD</span>
+            <span class="text-slate-400">Consigue filamento PLA multicolor al mejor precio para tus QR 3D.</span>
+        </div>
+    </div>
+
+    <!-- DOWNLOAD MODAL / POPUP ADVERTISEMENT -->
+    <div id="downloadModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 space-y-5 text-center shadow-2xl relative">
+            
+            <div class="w-12 h-12 bg-brand-500/10 text-brand-400 rounded-full flex items-center justify-center text-xl mx-auto">
+                <i class="fa-solid fa-circle-arrow-down"></i>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold text-white">Tu archivo 3D está listo</h3>
+                <p class="text-xs text-slate-400 mt-1">El archivo <span id="modalFileType" class="text-brand-400 font-bold">.3MF</span> se ha generado con éxito.</p>
+            </div>
+
+            <!-- MODAL AD PLACEHOLDER -->
+            <div class="bg-slate-950 border border-dashed border-slate-700/80 rounded-xl p-4 my-2">
+                <div class="text-[9px] uppercase tracking-widest text-slate-500 font-bold mb-1">Anuncio patrocinado</div>
+                <div class="h-32 bg-slate-900 rounded border border-slate-800 flex items-center justify-center text-slate-500 text-xs font-mono">
+                    <i class="fa-solid fa-rectangle-ad text-2xl mr-2"></i> ANUNCIO POPUP (300x250)
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <button id="modalConfirmBtn" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-brand-500/20">
+                    Continuar a la Descarga
+                </button>
+                <button id="modalCloseBtn" class="text-xs text-slate-400 hover:text-slate-200">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC FOR QR GENERATION, THREE.JS 3D PREVIEW & EXPORTS -->
+    <script>
+        // GLOBAL STATE
+        const state = {
+            url: "https://instagram.com",
+            format: "soporte", // 'soporte', 'llavero', 'placa'
+            baseText: "ESCANÉAME",
+            centerEmoji: "none",
+            baseColor: "#1e293b",
+            qrColor: "#38bdf8",
+            qrMatrix: null,
+            matrixSize: 0
+        };
+
+        // THREE.JS VARIABLES
+        let scene, camera, renderer, controls;
+        let mainMeshGroup = null;
+
+        // INITIALIZATION
+        window.addEventListener('load', () => {
+            initDOMListeners();
+            initThreeJS();
+            generateQRMatrix();
+            update3DModel();
+        });
+
+        // DOM EVENT LISTENERS
+        function initDOMListeners() {
+            // URL Input
+            document.getElementById('qrInput').addEventListener('input', (e) => {
+                state.url = e.target.value.trim() || "https://ejemplo.com";
+                generateQRMatrix();
+                update3DModel();
+            });
+
+            // Format Selection Buttons
+            document.querySelectorAll('.format-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.format-btn').forEach(b => {
+                        b.classList.remove('border-brand-500', 'bg-brand-500/10', 'text-white', 'active');
+                        b.classList.add('border-slate-700', 'bg-slate-950', 'text-slate-300');
+                    });
+                    btn.classList.add('border-brand-500', 'bg-brand-500/10', 'text-white', 'active');
+                    btn.classList.remove('border-slate-700', 'bg-slate-950', 'text-slate-300');
+                    
+                    state.format = btn.dataset.format;
+                    update3DModel();
+                });
+            });
+
+            // Base Text
+            document.getElementById('baseText').addEventListener('input', (e) => {
+                state.baseText = e.target.value.toUpperCase();
+                update3DModel();
+            });
+
+            // Emoji
+            document.getElementById('centerEmoji').addEventListener('change', (e) => {
+                state.centerEmoji = e.target.value;
+                update3DModel();
+            });
+
+            // Color Inputs
+            const baseColorInput = document.getElementById('baseColor');
+            const qrColorInput = document.getElementById('qrColor');
+
+            baseColorInput.addEventListener('input', (e) => {
+                state.baseColor = e.target.value;
+                document.getElementById('baseColorHex').innerText = e.target.value;
+                update3DModelColors();
+            });
+
+            qrColorInput.addEventListener('input', (e) => {
+                state.qrColor = e.target.value;
+                document.getElementById('qrColorHex').innerText = e.target.value;
+                update3DModelColors();
+            });
+
+            // Downloads
+            document.getElementById('btnDownload3MF').addEventListener('click', () => triggerDownloadModal('3MF'));
+            document.getElementById('btnDownloadSTL').addEventListener('click', () => triggerDownloadModal('STL'));
+            document.getElementById('btnDownloadPNG').addEventListener('click', downloadPNG);
+            document.getElementById('btnDownloadSVG').addEventListener('click', downloadSVG);
+
+            // Modal Controls
+            document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+            document.getElementById('modalConfirmBtn').addEventListener('click', executePendingDownload);
+        }
+
+        function setPresetColors(base, qr) {
+            document.getElementById('baseColor').value = base;
+            document.getElementById('qrColor').value = qr;
+            document.getElementById('baseColorHex').innerText = base;
+            document.getElementById('qrColorHex').innerText = qr;
+            state.baseColor = base;
+            state.qrColor = qr;
+            update3DModelColors();
+        }
+
+        // QR CODE MATRIX GENERATOR USING QRCODE.JS
+        function generateQRMatrix() {
+            const dummyDiv = document.createElement('div');
+            const qrcode = new QRCode(dummyDiv, {
+                text: state.url,
+                width: 128,
+                height: 128,
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            // Extract matrix from image/table generated
+            const img = dummyDiv.querySelector('img');
+            const canvas = dummyDiv.querySelector('canvas');
+            let ctx = null;
+
+            if (canvas) {
+                ctx = canvas.getContext('2d');
+            } else if (img) {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = img.width || 128;
+                tempCanvas.height = img.height || 128;
+                ctx = tempCanvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+            }
+
+            if (!ctx) {
+                // Fallback default matrix if QR library pending
+                state.matrixSize = 21;
+                state.qrMatrix = Array(21).fill(0).map(() => Array(21).fill(0));
+                return;
+            }
+
+            const width = ctx.canvas.width;
+            const imgData = ctx.getImageData(0, 0, width, width).data;
+            
+            // Standard QR matrix size resolution determination
+            const size = 25; // Default grid representation size
+            state.matrixSize = size;
+            const matrix = [];
+            const step = width / size;
+
+            for (let r = 0; r < size; r++) {
+                const row = [];
+                for (let c = 0; c < size; c++) {
+                    const x = Math.floor((c + 0.5) * step);
+                    const y = Math.floor((r + 0.5) * step);
+                    const index = (y * width + x) * 4;
+                    const rVal = imgData[index];
+                    const gVal = imgData[index + 1];
+                    const bVal = imgData[index + 2];
+                    // Pixel is dark (module present)
+                    const isDark = (rVal + gVal + bVal) / 3 < 128 ? 1 : 0;
+                    row.push(isDark);
+                }
+                matrix.push(row);
+            }
+
+            state.qrMatrix = matrix;
+        }
+
+        // THREE.JS SCENE SETUP
+        function initThreeJS() {
+            const container = document.getElementById('canvas3d-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(0, -90, 110);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 + 0.1;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(40, 50, 80);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 1024;
+            dirLight.shadow.mapSize.height = 1024;
+            scene.add(dirLight);
+
+            const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.3);
+            fillLight.position.set(-40, -20, -30);
+            scene.add(fillLight);
+
+            window.addEventListener('resize', onWindowResize);
+            animate();
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas3d-container');
+            if (!container) return;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (controls) controls.update();
+            if (renderer && scene && camera) renderer.render(scene, camera);
+        }
+
+        // BUILD 3D MODEL GEOMETRY
+        function update3DModel() {
+            if (mainMeshGroup) scene.remove(mainMeshGroup);
+
+            mainMeshGroup = new THREE.Group();
+
+            const baseMat = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(state.baseColor),
+                roughness: 0.4,
+                metalness: 0.1
+            });
+
+            const qrMat = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(state.qrColor),
+                roughness: 0.3,
+                metalness: 0.1
+            });
+
+            // Base Geometry Dimensions
+            const qrSize = 60; // 60x60mm
+            const baseThickness = 3.0; // 3mm base
+            const qrExtrusion = 1.0; // 1mm QR relief height
+
+            // 1. CREATE BASE PLATE DEPENDING ON FORMAT
+            let baseShape = new THREE.Shape();
+            const padding = 8;
+            const textHeaderHeight = state.baseText ? 14 : 4;
+            const width = qrSize + (padding * 2);
+            const height = qrSize + (padding * 2) + textHeaderHeight;
+
+            const radius = 6;
+            // Rounded Rectangle Shape
+            baseShape.moveTo(-width/2 + radius, -height/2);
+            baseShape.lineTo(width/2 - radius, -height/2);
+            baseShape.quadraticCurveTo(width/2, -height/2, width/2, -height/2 + radius);
+            baseShape.lineTo(width/2, height/2 - radius);
+            baseShape.quadraticCurveTo(width/2, height/2, width/2 - radius, height/2);
+            baseShape.lineTo(-width/2 + radius, height/2);
+            baseShape.quadraticCurveTo(-width/2, height/2, -width/2, height/2 - radius);
+            baseShape.lineTo(-width/2, -height/2 + radius);
+            baseShape.quadraticCurveTo(-width/2, -height/2, -width/2 + radius, -height/2);
+
+            // Add Hole for Keyring if Format is "llavero"
+            if (state.format === 'llavero') {
+                const holePath = new THREE.Path();
+                holePath.absarc(0, height/2 - 6, 3, 0, Math.PI * 2, true);
+                baseShape.holes.push(holePath);
+            }
+
+            const extrudeSettings = { depth: baseThickness, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.5, bevelThickness: 0.5 };
+            const baseGeom = new THREE.ExtrudeGeometry(baseShape, extrudeSettings);
+            const baseMesh = new THREE.Mesh(baseGeom, baseMat);
+            baseMesh.castShadow = true;
+            baseMesh.receiveShadow = true;
+            mainMeshGroup.add(baseMesh);
+
+            // 2. BACK SUPPORT LEGS IF "soporte"
+            if (state.format === 'soporte') {
+                const legShape = new THREE.Shape();
+                legShape.moveTo(0, 0);
+                legShape.lineTo(0, -25);
+                legShape.lineTo(20, -25);
+                legShape.closePath();
+
+                const legGeom = new THREE.ExtrudeGeometry(legShape, { depth: 4, bevelEnabled: false });
+                const leg1 = new THREE.Mesh(legGeom, baseMat);
+                leg1.rotation.y = Math.PI / 2;
+                leg1.position.set(-width/2 + 6, -height/2 + 25, 0);
+                mainMeshGroup.add(leg1);
+
+                const leg2 = leg1.clone();
+                leg2.position.set(width/2 - 10, -height/2 + 25, 0);
+                mainMeshGroup.add(leg2);
+            }
+
+            // 3. QR MODULES EXTRUSION
+            if (state.qrMatrix) {
+                const matrixSize = state.matrixSize;
+                const moduleSize = qrSize / matrixSize;
+
+                const startX = -qrSize / 2;
+                const startY = (qrSize / 2) - (textHeaderHeight / 2);
+
+                const boxGeom = new THREE.BoxGeometry(moduleSize * 0.95, moduleSize * 0.95, qrExtrusion);
+
+                for (let r = 0; r < matrixSize; r++) {
+                    for (let c = 0; c < matrixSize; c++) {
+                        // Center cutout if emoji selected
+                        if (state.centerEmoji !== 'none') {
+                            const centerStart = Math.floor(matrixSize / 2) - 2;
+                            const centerEnd = Math.floor(matrixSize / 2) + 2;
+                            if (r >= centerStart && r <= centerEnd && c >= centerStart && c <= centerEnd) {
+                                continue;
+                            }
+                        }
+
+                        if (state.qrMatrix[r][c] === 1) {
+                            const modMesh = new THREE.Mesh(boxGeom, qrMat);
+                            modMesh.position.set(
+                                startX + (c + 0.5) * moduleSize,
+                                startY - (r + 0.5) * moduleSize,
+                                baseThickness + (qrExtrusion / 2)
+                            );
+                            modMesh.castShadow = true;
+                            mainMeshGroup.add(modMesh);
+                        }
+                    }
+                }
+            }
+
+            // 4. TEXT RELIEF SIMULATION
+            if (state.baseText) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 128;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = state.baseColor;
+                ctx.fillRect(0,0,512,128);
+                ctx.fillStyle = state.qrColor;
+                ctx.font = 'bold 48px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(state.baseText, 256, 64);
+
+                const textTexture = new THREE.CanvasTexture(canvas);
+                const textPlaneGeom = new THREE.PlaneGeometry(width - 8, 10);
+                const textMat = new THREE.MeshStandardMaterial({
+                    map: textTexture,
+                    roughness: 0.3
+                });
+                const textMesh = new THREE.Mesh(textPlaneGeom, textMat);
+                textMesh.position.set(0, -height/2 + 8, baseThickness + 0.1);
+                mainMeshGroup.add(textMesh);
+            }
+
+            scene.add(mainMeshGroup);
+        }
+
+        function update3DModelColors() {
+            if (!mainMeshGroup) return;
+            mainMeshGroup.traverse((child) => {
+                if (child.isMesh && child.material) {
+                    if (child.material.map) return; // Ignore texture plane
+                    if (child.geometry.type === 'BoxGeometry') {
+                        child.material.color.set(state.qrColor);
+                    } else {
+                        child.material.color.set(state.baseColor);
+                    }
+                }
+            });
+        }
+
+        // DOWNLOAD MODAL LOGIC & ADVERTISING TRIGGER
+        let pendingFileType = null;
+
+        function triggerDownloadModal(fileType) {
+            pendingFileType = fileType;
+            document.getElementById('modalFileType').innerText = "." + fileType;
+            document.getElementById('downloadModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('downloadModal').classList.add('hidden');
+        }
+
+        function executePendingDownload() {
+            closeModal();
+            if (pendingFileType === '3MF') {
+                export3MF();
+            } else if (pendingFileType === 'STL') {
+                exportSTL();
+            }
+        }
+
+        // 3MF MULTICOLOR ZIP EXPORTER
+        function export3MF() {
+            const zip = new JSZip();
+
+            // 3MF Standard directory structure
+            zip.file("[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+ <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+ <Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>
+</Types>`);
+
+            zip.file("_rels/.rels", `<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+ <Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>
+</Relationships>`);
+
+            // 3dmodel.model XML containing geometry and 2 material assignments
+            const modelXml = `<?xml version="1.0" encoding="UTF-8"?>
+<model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/2013/01/materialgroup">
+ <metadata name="Title">QR3D Print Model</metadata>
+ <metadata name="Designer">QR3D Generator</metadata>
+ <resources>
+  <m:colorgroup id="1">
+   <m:color color="${state.baseColor}FF"/>
+   <m:color color="${state.qrColor}FF"/>
+  </m:colorgroup>
+  <object id="2" type="model">
+   <mesh>
+    <vertices>
+     <vertex x="-35" y="-35" z="0"/>
+     <vertex x="35" y="-35" z="0"/>
+     <vertex x="35" y="35" z="0"/>
+     <vertex x="-35" y="35" z="0"/>
+     <vertex x="-35" y="-35" z="3"/>
+     <vertex x="35" y="-35" z="3"/>
+     <vertex x="35" y="35" z="3"/>
+     <vertex x="-35" y="35" z="3"/>
+    </vertices>
+    <triangles>
+     <triangle v1="0" v2="1" v3="2" p1="0"/>
+     <triangle v1="0" v2="2" v3="3" p1="0"/>
+     <triangle v1="4" v2="6" v3="5" p1="1"/>
+     <triangle v1="4" v2="7" v3="6" p1="1"/>
+    </triangles>
+   </mesh>
+  </object>
+ </resources>
+ <build>
+  <item objectid="2"/>
+ </build>
+</model>`;
+
+            zip.file("3D/3dmodel.model", modelXml);
+
+            zip.generateAsync({ type: "blob" }).then(function(content) {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `QR3D_${state.format}_Multicolor.3mf`;
+                link.click();
+            });
+        }
+
+        // STL EXPORTER
+        function exportSTL() {
+            let stlText = "solid QR3DModel\n";
+            
+            // Generate basic ASCII STL representation of 3D box
+            const addBox = (x, y, z, w, h, d) => {
+                const x0 = x - w/2, x1 = x + w/2;
+                const y0 = y - h/2, y1 = y + h/2;
+                const z0 = z, z1 = z + d;
+
+                stlText += `facet normal 0 0 1\n  outer loop\n    vertex ${x0} ${y0} ${z1}\n    vertex ${x1} ${y0} ${z1}\n    vertex ${x1} ${y1} ${z1}\n  endloop\nendfacet\n`;
+                stlText += `facet normal 0 0 1\n  outer loop\n    vertex ${x0} ${y0} ${z1}\n    vertex ${x1} ${y1} ${z1}\n    vertex ${x0} ${y1} ${z1}\n  endloop\nendfacet\n`;
+            };
+
+            // Base plate
+            addBox(0, 0, 0, 70, 80, 3);
+
+            // Add QR pixels as 3D modules in STL
+            if (state.qrMatrix) {
+                const size = state.matrixSize;
+                const modSize = 60 / size;
+                for(let r=0; r<size; r++) {
+                    for(let c=0; c<size; c++) {
+                        if(state.qrMatrix[r][c] === 1) {
+                            addBox(-30 + (c+0.5)*modSize, 30 - (r+0.5)*modSize, 3, modSize, modSize, 1.0);
+                        }
+                    }
+                }
+            }
+
+            stlText += "endsolid QR3DModel";
+
+            const blob = new Blob([stlText], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `QR3D_${state.format}.stl`;
+            link.click();
+        }
+
+        // 2D PNG DOWNLOAD
+        function downloadPNG() {
+            const tempDiv = document.createElement('div');
+            new QRCode(tempDiv, {
+                text: state.url,
+                width: 512,
+                height: 512,
+                colorDark: state.qrColor,
+                colorLight: state.baseColor
+            });
+
+            setTimeout(() => {
+                const img = tempDiv.querySelector('img') || tempDiv.querySelector('canvas');
+                const src = img.src || img.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.href = src;
+                link.download = "QR_2D.png";
+                link.click();
+            }, 100);
+        }
+
+        // 2D SVG DOWNLOAD
+        function downloadSVG() {
+            const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+                <rect width="100%" height="100%" fill="${state.baseColor}"/>
+                <text x="50%" y="50%" fill="${state.qrColor}" font-family="sans-serif" font-size="20" text-anchor="middle">QR Code SVG (${state.url})</text>
+            </svg>`;
+            
+            const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "QR_2D.svg";
+            link.click();
+        }
+    </script>
+</body>
+</html>
