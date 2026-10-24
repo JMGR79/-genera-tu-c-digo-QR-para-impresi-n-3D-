@@ -1,0 +1,9 @@
+[build]
+  base = "."
+  publish = "."
+  command = ""
+
+[[redirects]]
+  from = "/"
+  to = "/qr3d_print_generador_de_c_digos_qr_para_impresi_n_3d.html"
+  status = 200
