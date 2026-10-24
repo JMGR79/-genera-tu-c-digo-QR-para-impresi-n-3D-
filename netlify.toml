@@ -1,0 +1,10 @@
+[build]
+  # Override the dashboard "Base directory" setting, which points to an invalid path.
+  base = "/"
+  publish = "."
+
+# The app lives in a single HTML file; serve it at the site root.
+[[redirects]]
+  from = "/"
+  to = "/qr3d_print_generador_de_c_digos_qr_para_impresi_n_3d.html"
+  status = 200
